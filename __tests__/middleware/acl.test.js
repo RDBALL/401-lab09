@@ -1,59 +1,65 @@
 'use strict';
 
-
-const { user } = require('../../src/models/index');
+const { db } = require('../../src/models/index');
 const supertest = require('supertest');
 const server = require('../../src/server').server;
 const mockRequest = supertest(server);
 
-describe('V2 ROUTES TESTS:', () => {
-  let admin, token;
-
-  beforeAll(async () => {
-    admin = await user.create({ username: 'testAdmin', password: 'test', role: 'admin' });
-    token = admin.body.token;
-    console.log('---------------------------',token);
-  });
-
-  it('allow a user with bearer token create and add an item on POST/api/v2/:model', async () => {
-    const response = await mockRequest.post('/api/v2/drinks').send({ beer: 'IPA'}).auth(token, { type: 'bearer' });
-
-    expect(response.status).toEqual(201);
-    expect(response.body._id).toBeDefined();
-  });
-
-  // it('should have GET/api/v2/:model w bearer token return a list of items', async () => {
-  //   const response = await mockRequest.get('/api/v2/clothes').auth(token, { type: 'bearer' });
-
-  //   expect(response.status).toEqual(200);
-  //   expect(response.body[0].name).toEqual('Shirt');
-  // });
-
-  // it('should have GET/api/v2/:model/ID with bearer token return item by ID', async () => {
-  //   const jacket = await mockRequest.post('/api/v2/clothes').send({ name: 'Jacket', color: 'Red', size: 'Small' }).auth(token, { type: 'bearer' });
-  //   const response = await mockRequest.get(`/api/v2/clothes/${jacket.body._id}`).auth(token, { type: 'bearer' });
-
-  //   expect(response.body._id).toEqual(jacket.body._id);
-  // });
-
-  // it('should have PUT/api/v2/:model/ID with bearer token return a single, updated item by ID', async () => {
-  //   const drinks = await mockRequest.post('/api/v1/drinks').send({ Beer: null, Mixed_Drink: null, Non_Alcoholic: 'Water' }).auth(token, { type: 'bearer' });
-
-  //   const response = await mockRequest.put(`/api/v1/clothes/${drinks.body._id}`).send({ Beer: null, Mixed_Drink: null, Non_Alcoholic: 'Water' }).auth(token, { type: 'bearer' });
-
-  //   expect(response.body.size).toEqual('Large');
-  //   expect(response.body._id).toEqual(drinks.body._id);
-  // });
-
-  // it('should have DELETE/api/v2/:model/ID with bearer token delete an item', async () => {
-  //   const shoes = await mockRequest.post('/api/v1/clothes').send({ name: 'shoes', color: 'Black', size: '10' }).auth(token, { type: 'bearer' });
-
-  //   const response = await mockRequest.delete(`/api/v1/clothes/${shoes.body._id}`).auth(token, { type: 'bearer' });
-
-  //   expect(response.status).toEqual(200);
-
-  //   const getResponse = await mockRequest.get(`/api/v1/clothes/${shoes.body._id}`).auth(token, { type: 'bearer' });
-  //   expect(getResponse.body).toEqual(null);
-  // });
-
+beforeAll(async () => {
+  await db.sync();
 });
+afterAll(async () => {
+  await db.drop();
+});
+
+describe('Auth Router', () => {
+
+  describe('ACL Role positions-', () => {
+    it('user role should have read capabilities', async () => {
+      const user = await mockRequest.post('/signup').send({
+        username: 'user',
+        password: 'password',
+        roll: 'user',
+      });
+
+      expect(user.status).toEqual(201);
+      expect(user.body.token).toBeTruthy();
+      expect(user.body.user.capabilities).toEqual(['read']);
+    });
+    it('writer role should have read, create capabilities', async () => {
+      const writer = await mockRequest.post('/signup').send({
+        username: 'writer',
+        password: 'password',
+        role: 'writer',
+      });
+
+      expect(writer.status).toEqual(201);
+      expect(writer.body.token).toBeTruthy();
+      expect(writer.body.user.capabilities).toEqual(['read', 'create']);
+    });
+    it('editor role should have read, create, update capabilities', async () => {
+      const editor = await mockRequest.post('/signup').send({
+        username: 'editor',
+        password: 'password',
+        role: 'editor',
+      });
+
+      expect(editor.status).toEqual(201);
+      expect(editor.body.token).toBeTruthy();
+      expect(editor.body.user.capabilities).toEqual(['read', 'create', 'update']);
+    });
+    it('admin role should have read, create, update, delete capabilities', async () => {
+      const admin = await mockRequest.post('/signup').send({
+        username: ' admin',
+        password: 'password',
+        role: 'admin',
+      });
+
+      expect(admin.status).toEqual(201);
+      expect(admin.body.token).toBeTruthy();
+      expect(admin.body.user.capabilities).toEqual(['read', 'create', 'update', 'delete']);
+    });
+  });
+});
+
+
