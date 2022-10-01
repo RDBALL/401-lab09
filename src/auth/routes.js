@@ -31,7 +31,7 @@ authRouter.post('/signin', basicAuth, (req, res, next) => {
 
 authRouter.get('/users', bearerAuth, permissions('delete'), async (req, res, next) => {
   const userRecords = await user.findAll({});
-  const list = userRecords.map(userRecord => userRecord.username);
+  const list = userRecords.map(userRecord => userRecord);
   res.status(200).json(list);
 });
 
