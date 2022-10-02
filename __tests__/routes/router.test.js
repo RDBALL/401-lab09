@@ -32,9 +32,8 @@ describe('Auth Router', () => {
     expect(userObject.user.id).toBeDefined();
     expect(userObject.user.username).toEqual(userData.testUser.username);
   });
-  it('Can create a new user', async () => {
-
-    const response = await mockRequest.post('/banana').send(userData.testUser);
+  it('404 on bad route', async () => {
+    const response = await mockRequest.get('/banana').send(userData.testUser);
     expect(response.status).toBe(404);
   });
 
