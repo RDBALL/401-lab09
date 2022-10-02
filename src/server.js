@@ -4,7 +4,7 @@ const express = require('express');
 
 const notFoundHandler = require('./error-handlers/404.js');
 const errorHandler = require('./error-handlers/500.js');
-const logger = require('./middleware/logger.js');
+// const logger = require('./middleware/logger.js');
 const cors = require('cors');
 const morgan = require('morgan');
 
@@ -20,7 +20,7 @@ app.use(morgan('dev'));
 
 app.use(express.json());
 
-app.use(logger);
+// app.use(logger);
 
 //routes
 app.use(authRouter);

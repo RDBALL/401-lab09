@@ -18,7 +18,7 @@ const userModel = (sequelize, DataTypes) => {
       set(tokenObj) {
         let token = jwt.sign(tokenObj, SECRET);
         return token;
-      }
+      },
     },
     capabilities: {
       type: DataTypes.VIRTUAL,
@@ -30,8 +30,8 @@ const userModel = (sequelize, DataTypes) => {
           admin: ['read', 'create', 'update', 'delete'],
         };
         return acl[this.role];
-      }
-    }
+      },
+    },
   });
 
   model.beforeCreate(async (user) => {
@@ -58,6 +58,6 @@ const userModel = (sequelize, DataTypes) => {
   };
 
   return model;
-}
+};
 
 module.exports = userModel;
