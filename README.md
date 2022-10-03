@@ -4,7 +4,9 @@
 
 ### Problem Domain
 
-* Create a new application using your API Server and Authentication System
+* Create a new application using your API Server and Authentication
+* Significant change was to take data models from food and clothing to food and drinks, effectively creating the seeds for an ordering system for an online restaurant
+* For a UI, we implemented an interactive CLI with Inquirer
 
 Deployed production server: [Heroku - rb-ac lab09 API](https://rb-ac-lab-09.herokuapp.com/)
 
